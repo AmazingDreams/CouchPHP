@@ -1,0 +1,16 @@
+{
+    "name": "amazingdreams/couchphp",
+    "description": "Provides utilities and a backend for communicating with a CouchDB server",
+    "authors": [
+        {
+            "name": "Dennis Ruhe",
+            "email": "dennis@amazingsystems.nl"
+        }
+    ],
+    "autoload" : {
+        "psr-4" : {
+            "AD\\" : "src/"
+        }
+    },
+    "require": {}
+}

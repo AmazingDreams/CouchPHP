@@ -12,7 +12,8 @@ apt-get dist-upgrade -q -y --force-yes
 apt-get install -q -y --force-yes \
 	git vim \
 	couchdb \
-	php5-fpm nginx
+	php5-fpm nginx \
+	phpunit php5-xdebug php5-curl
 
 cat >> /etc/nginx/sites-available/default << 'EOF'
 server {
