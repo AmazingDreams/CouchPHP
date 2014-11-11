@@ -39,6 +39,14 @@ class ClientTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('http://localhost:5984/test', $client->getFullUrl());
 	}
 
+	public function testQuery()
+	{
+		$client = new CouchClient($this->_config);
+		$response = $client->query('GET', '/');
+
+		$this->assertEquals(200, $response->getStatusCode());
+	}
+
 	public function testCreateDatabase()
 	{
 		$client = new CouchClient($this->_config);
@@ -63,6 +71,18 @@ class ClientTest extends PHPUnit_Framework_TestCase {
 		$client->createDatabase();
 
 		$this->assertTrue($client->removeDatabase());
+	}
+
+	public function testGetUUIDs()
+	{
+		$client = new CouchCLient($this->_config);
+
+		$uuid = $client->getUUID();
+		$this->assertTrue(is_string($uuid));
+		$this->assertEquals(1, count($uuid));
+
+		$uuids = $client->getUUID(10);
+		$this->assertEquals(10, count($uuids));
 	}
 
 	public function tearDown()

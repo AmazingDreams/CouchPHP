@@ -181,6 +181,7 @@ class Request {
 	public function setUrlParams(array $params)
 	{
 		$this->_urlParams = $params;
+		return $this;
 	}
 
 	/**
@@ -214,7 +215,6 @@ class Request {
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->getMethod());
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($curl, CURLOPT_HEADER, TRUE);
 
 		$content     = curl_exec($curl);
 		$statusCode  = curl_getinfo($curl, CURLINFO_HTTP_CODE);

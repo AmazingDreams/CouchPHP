@@ -38,8 +38,7 @@ class Client {
 	 */
 	public function createDatabase()
 	{
-		$response = Request::factory('PUT', $this->getFullUrl())
-			->send();
+		$response = $this->query('PUT', $this->getDBName());
 
 		return $response->getStatusCode() == 201;
 	}
@@ -54,8 +53,7 @@ class Client {
 	{
 		// We have to use a GET request because curl hangs
 		// when you use HEAD: http://sourceforge.net/p/curl/bugs/694/
-		$response = Request::factory('GET', $this->getFullUrl())
-			->send();
+		$response = $this->query('GET', $this->getDBName());
 
 		return $response->getStatusCode() == 200;
 	}
@@ -85,8 +83,40 @@ class Client {
 	 */
 	public function getFullUrl()
 	{
-		return $this->getDSN().'/'.$this->_config['dbname'];
+		return $this->getDSN().'/'.$this->getDBName();
 	}
+
+	/**
+	 * Get the database name
+	 *
+	 * @return  String  Database name
+	 */
+	public function getDBName()
+	{
+		return $this->_config['dbname'];
+	}
+
+	/**
+	 * Get a UUID
+	 *
+	 * @param   $num  Number of UUIDS to return, defaults to 1
+	 * @return  Single UUID or array of UUIDs
+	 */
+	public function getUUID($num = 1)
+	{
+		$response = $this->query('GET', '_uuids', array(), array('count' => $num));
+
+		if ( $response->getStatusCode() != 200)
+			return FALSE;
+
+		$json = $response->getContent();
+
+		if($num == 1)
+			return $json->uuids[0];
+
+		return $json->uuids;
+	}
+
 
 	/**
 	 * Removes the database
@@ -95,8 +125,7 @@ class Client {
 	 */
 	public function removeDatabase()
 	{
-		$response = Request::factory('DELETE', $this->getFullUrl())
-			->send();
+		$response = $this->query('DELETE', $this->getDBName());
 
 		return $response->getStatusCode() == 200;
 	}
@@ -117,6 +146,26 @@ class Client {
 		$this->_config = $config;
 
 		return $this;
+	}
+
+	/**
+	 * Run a query against the DB
+	 *
+	 * @param  $method  HTTP Method
+	 * @param  $path    Path to query
+	 * @param  $data    Optional data
+	 * @param  $data    Optional url parameters
+	 */
+	public function query($method, $path, $data = array(), array $urlParams = array())
+	{
+		// Check if path starts with '/' and add it if it doesn't
+		if($path[0] != '/')
+			$path = '/'.$path;
+
+		return Request::factory($method, $this->getDSN().$path)
+			->setData($data)
+			->setUrlParams($urlParams)
+			->send();
 	}
 
 }

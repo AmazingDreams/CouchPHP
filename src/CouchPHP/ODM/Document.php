@@ -1,0 +1,134 @@
+<?php
+
+namespace AD\CouchPHP\ODM;
+
+class Document {
+
+	/**
+	 * Flag whether we loaded the document or not
+	 */
+	protected $_loaded = FALSE;
+
+	/**
+	 * Array of values
+	 */
+	protected $_values;
+
+	/**
+	 * Holds the manager
+	 */
+	protected $_manager;
+
+	/**
+	 * Convert this object to a json string
+	 *
+	 * @return  String  JSON representation
+	 */
+	public function toJSON()
+	{
+		return json_encode($this->_values);
+	}
+
+	/**
+	 * Reads a json object or a json string
+	 *
+	 * @chainable
+	 * @param   $json  String or object
+	 * @return  this
+	 */
+	public function readJSON($json)
+	{
+		if(is_string($json))
+			$json = json_decode($json);
+
+		// Check if parsing worked
+		if($json === NULL)
+			throw new \Exception('Invalid JSON');
+
+		foreach($json as $key => $value)
+		{
+			$this->_values[$key] = $value;
+		}
+	}
+
+	/**
+	 * Get this documents manager
+	 *
+	 * @return  The manager
+	 */
+	public function getManager()
+	{
+		return $this->_manager;
+	}
+
+	/**
+	 * Save this document to the database
+	 *
+	 * @param  $location  Can be an instance of a Manager
+	 *                    Or an instance of a client
+	 *
+	 * @return  boolean  Stored succesfully or not
+	 */
+	public function save($location = NULL)
+	{
+		if($location == NULL)
+			$location = $this->_manager;
+
+		if($location instanceof Manager)
+			$manager = $location;
+
+		if($location instanceof Client)
+			$manager = new Manager($location);
+
+		if($manager)
+			return $manager->store($this);
+
+		throw new \Exception("I don't know where to store myself");
+	}
+
+	/**
+	 * Set the manager
+	 *
+	 * @param  $manager  Manager
+	 */
+	public function setManager(Manager $manager)
+	{
+		$this->_manager = $manager;
+	}
+
+	/**
+	 * Get value
+	 *
+	 * @param   $key   Key to get
+	 * @return  Mixed
+	 */
+	public function __get($key)
+	{
+		if (isset($this->_values[$key]))
+			return $this->_values[$key];
+
+		return NULL;
+	}
+
+	/**
+	 * Set value
+	 *
+	 * @param  $key    Key to set
+	 * @param  $value  Value to set
+	 */
+	public function __set($key, $value)
+	{
+		$this->_values[$key] = $value;
+	}
+
+	/**
+	 * Uses $this->toJSON();
+	 *
+	 * @return  String  JSON representation
+	 */
+	public function __toString()
+	{
+		return $this->toJSON();
+	}
+
+}
