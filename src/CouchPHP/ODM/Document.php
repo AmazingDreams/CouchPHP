@@ -62,6 +62,16 @@ class Document {
 	}
 
 	/**
+	 * Check whether this document is loaded
+	 *
+	 * @return  Loaded or not
+	 */
+	public function isLoaded()
+	{
+		return $this->_loaded;
+	}
+
+	/**
 	 * Save this document to the database
 	 *
 	 * @param  $location  Can be an instance of a Manager
@@ -94,6 +104,19 @@ class Document {
 	public function setManager(Manager $manager)
 	{
 		$this->_manager = $manager;
+	}
+
+	/**
+	 * Set the loaded state
+	 *
+	 * @chainable
+	 * @param  $value  TRUE or FALSE
+	 * @return this
+	 */
+	public function setLoaded($value)
+	{
+		$this->_loaded = $value;
+		return $this;
 	}
 
 	/**

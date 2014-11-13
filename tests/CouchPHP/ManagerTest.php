@@ -40,17 +40,30 @@ class ManagerTest extends \PHPUnit_Framework_Testcase {
 		$document->a = 'a';
 		$document->b = 'b';
 
-		$manager->store($document);
+		$this->assertTrue($manager->store($document));
 	}
 
-	public function testFind()
+	public function testFindById()
+	{
+		$manager = new Manager($this->_client);
+		$document = $manager->getNewDocument();
+
+		$this->assertTrue($manager->store($document));
+
+		$document = $manager->findById($document->_id);
+		$this->assertTrue($document->isLoaded());
+		$this->assertTrue(is_string($document->_id));
+		$this->assertTrue(is_string($document->_rev));
+	}
+
+	public function testFindByKeys()
 	{
 
 	}
 
 	public function tearDown()
 	{
-
+		$this->_client->removeDatabase();
 	}
 
 }

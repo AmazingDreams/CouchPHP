@@ -12,8 +12,7 @@ class Manager {
 	protected static $defaultClient;
 
 	/**
-	 * Set the default client
-	 *
+	 * Set the default client *
 	 * @param  $client  Client to set default
 	 */
 	public static function setDefaultClient(Client $client)
@@ -53,12 +52,13 @@ class Manager {
 	public function findById($id)
 	{
 		$document = $this->getNewDocument();
-		$response = $this->_client->query('GET', '/docs/'.$id);
+		$response = $this->_client->query('GET', $this->_client->getDBName().'/'.$id);
 
 		if($response->getStatusCode() != 200)
 			return $document;
 
-		$document->readJson(json_decode($response->getContent()));
+		$document->readJSON($response->getContent());
+		$document->setLoaded(TRUE);
 
 		return $document;
 	}
@@ -85,7 +85,7 @@ class Manager {
 	 */
 	public function setCouchClient(Client $client)
 	{
-		$this->_couchClient = $client;
+		$this->_client = $client;
 		return $this;
 	}
 
@@ -98,8 +98,12 @@ class Manager {
 	{
 		if($document->_id === NULL)
 		{
-
+			$document->_id = $this->_client->getUUID(1);
 		}
+
+		$response = $this->_client->query('PUT', $this->_client->getDBName().'/'.$document->_id, $document);
+
+		return $response->getStatusCode() == 201 OR $response->getStatusCode() == 202;
 	}
 
 }
