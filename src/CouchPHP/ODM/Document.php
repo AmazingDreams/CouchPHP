@@ -20,6 +20,16 @@ class Document {
 	protected $_manager;
 
 	/**
+	 * Initializes a new instance of document
+	 *
+	 * @param  $manager  Optional ODM manager
+	 */
+	public function __construct($manager = NULL)
+	{
+		$this->_manager = $manager;
+	}
+
+	/**
 	 * Convert this object to a json string
 	 *
 	 * @return  String  JSON representation
@@ -74,23 +84,15 @@ class Document {
 	/**
 	 * Save this document to the database
 	 *
-	 * @param  $location  Can be an instance of a Manager
-	 *                    Or an instance of a client
-	 *
-	 * @return  boolean  Stored succesfully or not
+	 * @param   $location  Can be an instance of a Manager
+	 * @return  boolean    Stored succesfully or not
 	 */
-	public function save($location = NULL)
+	public function save(Manager $manager = NULL)
 	{
-		if($location == NULL)
-			$location = $this->_manager;
+		if($manager === NULL)
+			$manager = $this->_manager;
 
-		if($location instanceof Manager)
-			$manager = $location;
-
-		if($location instanceof Client)
-			$manager = new Manager($location);
-
-		if($manager)
+		if(isset($manager))
 			return $manager->store($this);
 
 		throw new \Exception("I don't know where to store myself");

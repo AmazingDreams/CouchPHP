@@ -23,13 +23,23 @@ class DocumentTest extends \PHPUnit_Framework_Testcase {
 
 	public function testSave()
 	{
+		// Save with Manager as parameter
 		$manager  = new MockManager(new MockClient());
-		$document = new Document;
-
-		$document->a = 'a';
-		$document->b = 'b';
-
+		$document = new Document();
 		$this->assertTrue($document->save($manager));
+		$this->assertTrue($manager->storeWasCalled);
+
+		// Save with setManager
+		$manager  = new MockManager(new MockClient());
+		$document = new Document();
+		$document->setManager($manager);
+		$this->assertTrue($document->save());
+		$this->assertTrue($manager->storeWasCalled);
+
+		// Save with manager in constructor
+		$manager  = new MockManager(new MockClient());
+		$document = new Document($manager);
+		$this->assertTrue($document->save());
 		$this->assertTrue($manager->storeWasCalled);
 	}
 
@@ -39,7 +49,7 @@ class MockManager extends Manager {
 
 	public $storeWasCalled = FALSE;
 
-	public function store()
+	public function store($document)
 	{
 		$this->storeWasCalled = TRUE;
 		return TRUE;
