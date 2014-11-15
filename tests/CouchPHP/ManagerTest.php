@@ -18,9 +18,6 @@ class ManagerTest extends \PHPUnit_Framework_Testcase {
 			'dbname'   => 'test',
 		));
 		$this->_client->createDatabase();
-
-		$manager = new Manager($this->_client);
-		$manager->getNewDocument();
 	}
 
 	public function testCreateDocument()
@@ -41,6 +38,7 @@ class ManagerTest extends \PHPUnit_Framework_Testcase {
 		$document->b = 'b';
 
 		$this->assertTrue($manager->store($document));
+		$this->assertTrue(is_string($document->rev));
 	}
 
 	public function testFindById()

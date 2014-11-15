@@ -3,6 +3,7 @@
 namespace AD\CouchPHP\ODM;
 
 use \AD\CouchPHP\Client;
+use \AD\CouchPHP\Views\Collection;
 
 class Manager {
 
@@ -31,8 +32,7 @@ class Manager {
 	}
 
 	/**
-	 * The couch client this document has
-	 */
+	 * The couch client this document has */
 	protected $_client;
 
 	/**
@@ -70,10 +70,7 @@ class Manager {
 	 */
 	public function getNewDocument()
 	{
-		$document = new Document();
-		$document->setManager($this);
-
-		return $document;
+		return new Document($this);
 	}
 
 	/**
@@ -94,16 +91,19 @@ class Manager {
 	 *
 	 * @return  TRUE on succes or FALSE on failure
 	 */
-	public function store(Document $document)
+	public function store(Document &$document)
 	{
+		// Get a new UUID for the document
 		if($document->_id === NULL)
-		{
 			$document->_id = $this->_client->getUUID(1);
-		}
 
-		$response = $this->_client->query('PUT', $this->_client->getDBName().'/'.$document->_id, $document);
+		$response = $this->_client->query('PUT', $this->_client->getDBName().'/'.$document->_id, $document->toJSON());
+		$success  = ($response->getStatusCode() == 201 OR $response->getStatusCode() == 202);
 
-		return $response->getStatusCode() == 201 OR $response->getStatusCode() == 202;
+		if($success)
+			$document->readJSON($response->getContent());
+
+		return $success;
 	}
 
 }
